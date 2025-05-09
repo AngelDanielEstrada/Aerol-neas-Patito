@@ -1,60 +1,28 @@
 package vuelos;
 
+import personas.Cliente;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Vuelo {
-    private String numeroVuelo;
+    private String numero;
     private String origen;
     private String destino;
-    private String estado;
-    private String fecha;
-    private int capacidad;
-    private List<Asiento> asientos;
+    private List<Cliente> pasajeros;
 
-    public Vuelo(String numeroVuelo, String origen, String destino, String fecha, int capacidad) {
-        this.numeroVuelo = numeroVuelo;
+    public Vuelo(String numero, String origen, String destino) {
+        this.numero = numero;
         this.origen = origen;
         this.destino = destino;
-        this.fecha = fecha;
-        this.capacidad = capacidad;
-        this.estado = "Programado";
-        this.asientos = new ArrayList<>();
-        for (int i = 1; i <= capacidad; i++) {
-            String numeroAsiento = "A" + i;
-            this.asientos.add(new Asiento(numeroAsiento, "Económica"));
-        }
+        this.pasajeros = new ArrayList<>();
     }
 
-    public int verDisponibilidad() {
-        int disponibles = 0;
-        for (Asiento asiento : asientos) {
-            if (asiento.estaDisponible()) {
-                disponibles++;
-            }
-        }
-        return disponibles;
+    public void agregarPasajero(Cliente cliente) {
+        pasajeros.add(cliente);
     }
 
-    public void actualizarEstado(String nuevoEstado) {
-        this.estado = nuevoEstado;
-    }
-
-    public boolean asignarAsiento(Asiento asiento) {
-        if (asiento.estaDisponible()) {
-            asiento.reservar();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean estaLleno() {
-        return verDisponibilidad() == 0;
-    }
-
-    // Getters y Setters
-    public String getNumeroVuelo() {
-        return numeroVuelo;
+    public String getNumero() {
+        return numero;
     }
 
     public String getOrigen() {
@@ -65,27 +33,7 @@ public class Vuelo {
         return destino;
     }
 
-    public String getEstado() {
-        return estado;
-    }
-
-    public String getFecha() {
-        return fecha;
-    }
-
-    public int getCapacidad() {
-        return capacidad;
-    }
-
-    public List<Asiento> getAsientos() {
-        return asientos;
-    }
-
-    public void setFecha(String fecha) {
-        this.fecha = fecha;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public List<Cliente> getPasajeros() {
+        return pasajeros;
     }
 }

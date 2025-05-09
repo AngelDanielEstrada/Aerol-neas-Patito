@@ -1,48 +1,18 @@
 package personas;
 
-public class Empleado extends Usuario {
-
-    private String numeroEmpleado;
+public class Empleado extends Persona {
     private String puesto;
 
-    public Empleado(String id, String nombre, String email, String contraseña,
-                    String numeroEmpleado, String puesto) {
-        super(id, nombre, email, contraseña);
-        this.numeroEmpleado = numeroEmpleado;
+    public Empleado(String nombre, String correo, String puesto) {
+        super(nombre, correo);
         this.puesto = puesto;
     }
 
-    public String getNumeroEmpleado() {
-        return numeroEmpleado;
+    public void asignarTarea() {
+        System.out.println("Tarea asignada al empleado: " + nombre);
     }
 
-    public void setNumeroEmpleado(String numeroEmpleado) {
-        this.numeroEmpleado = numeroEmpleado;
-    }
-
-    public String getPuesto() {
-        return puesto;
-    }
-
-    public void setPuesto(String puesto) {
-        this.puesto = puesto;
-    }
-
-    // Método para gestionar un vuelo (puede actualizar estado, etc.)
-    public void gestionarVuelo(Vuelo vuelo) {
-        // Acción simulada
-        System.out.println("Empleado " + nombre + " gestionando el vuelo " + vuelo.getNumeroVuelo());
-        // Aquí podrías actualizar estado, horario, etc.
-    }
-
-    // Método para asignar un asiento a una reserva
-    public void asignarAsiento(Reservacion reservacion, Asiento asiento) {
-        if (asiento.estaDisponible()) {
-            reservacion.setAsiento(asiento);
-            asiento.reservar();
-            System.out.println("Asiento " + asiento.getNumero() + " asignado exitosamente.");
-        } else {
-            System.out.println("El asiento ya está ocupado.");
-        }
+    public void verPerfil() {
+        System.out.println("Empleado: " + nombre + ", Puesto: " + puesto);
     }
 }

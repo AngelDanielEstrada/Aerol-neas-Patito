@@ -12,7 +12,6 @@ public class ExcepcionVueloLleno extends Exception {
     }
 
     public void registrarError() {
-        System.out.println("Vuelo lleno: " + mensaje);
-        // Registro en auditoría si es necesario
+        System.out.println("Error registrado: " + mensaje);
     }
 }

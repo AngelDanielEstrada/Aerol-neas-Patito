@@ -7,15 +7,14 @@ public class Auditoria {
     private String descripcion;
     private LocalDateTime fecha;
 
-    public Auditoria(String id, String descripcion) {
+    public Auditoria(String id, String descripcion, LocalDateTime fecha) {
         this.id = id;
         this.descripcion = descripcion;
-        this.fecha = LocalDateTime.now();
+        this.fecha = fecha;
     }
 
     public void registrarAccion() {
-        // Aquí podrías guardar la auditoría en una base de datos o archivo
-        System.out.println("Acción registrada: " + descripcion);
+        System.out.println("Acción registrada: " + descripcion + " en " + fecha);
     }
 
     public String getDescripcion() {

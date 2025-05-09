@@ -13,6 +13,5 @@ public class ExcepcionReservaInvalida extends Exception {
 
     public void registrarError() {
         System.out.println("Error registrado: " + mensaje);
-        // Lógica para registrar en sistema de auditoría
     }
 }
