@@ -1,17 +1,12 @@
 package core;
 
 public class ExcepcionVueloLleno extends Exception {
-    private String mensaje;
-
     public ExcepcionVueloLleno(String mensaje) {
-        this.mensaje = mensaje;
+        super(mensaje);
     }
 
-    public String mostrarMensaje() {
-        return mensaje;
-    }
-
+    // Metodo adicional para registro
     public void registrarError() {
-        System.out.println("Error registrado: " + mensaje);
+        System.err.println("Error registrado: " + getMessage());
     }
 }
