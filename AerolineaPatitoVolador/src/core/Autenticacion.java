@@ -21,5 +21,7 @@ public class Autenticacion {
 
     public static Usuario crearUsuarioAdminPorDefecto() {
         return new personas.Administrador("Admin", "lecuarrao@gmail.com", "admin123");
+
     }
+
 }

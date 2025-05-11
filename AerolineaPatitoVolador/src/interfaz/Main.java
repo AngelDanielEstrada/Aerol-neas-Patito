@@ -4,6 +4,8 @@ import core.*;
 import personas.*;
 import vuelos.*;
 import reservaciones.*;
+
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.time.LocalDate;
 
@@ -136,15 +138,37 @@ public class Main {
                 String idEmpleado = scanner.nextLine();
                 System.out.print("Número de licencia: ");
                 String licencia = scanner.nextLine();
-                System.out.print("Fecha vencimiento licencia (AAAA-MM-DD): ");
-                LocalDate fechaVencimiento = LocalDate.parse(scanner.nextLine());
+
+                LocalDate fechaVencimiento = null;
+                while (fechaVencimiento == null) {
+                    System.out.print("Fecha vencimiento licencia (AAAA-MM-DD): ");
+                    String fechaStr = scanner.nextLine();
+                    try {
+                        fechaVencimiento = LocalDate.parse(fechaStr);
+                    } catch (DateTimeParseException e) {
+                        System.out.println("Fecha inválida. Usa el formato AAAA-MM-DD.");
+                    }
+                }
+
                 nuevoUsuario = new Piloto(idEmpleado, nombre, correo, password, licencia, fechaVencimiento);
             }
             case 3 -> {
                 System.out.print("ID Empleado: ");
                 String idEmpleado = scanner.nextLine();
-                System.out.print("Años de experiencia: ");
-                int experiencia = Integer.parseInt(scanner.nextLine());
+
+                int experiencia = -1;
+                while (experiencia < 0) {
+                    System.out.print("Años de experiencia: ");
+                    try {
+                        experiencia = Integer.parseInt(scanner.nextLine());
+                        if (experiencia < 0) {
+                            System.out.println("La experiencia no puede ser negativa.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Entrada inválida. Ingresa un número entero.");
+                    }
+                }
+
                 nuevoUsuario = new Azafato(idEmpleado, nombre, correo, password, experiencia);
             }
             default -> {
@@ -156,6 +180,7 @@ public class Main {
         admin.crearUsuario(nuevoUsuario);
         usuarios.add(nuevoUsuario);
         System.out.println("Usuario creado exitosamente");
+
     }
 
     private static void eliminarUsuario(Administrador admin) {
