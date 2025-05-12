@@ -25,7 +25,7 @@ public class Autenticacion {
 
     }
     public static Usuario crearUsuarioAdminPorDefecto2() {
-        return new Administrador("Admin Eve", "2019776f@umich.mx", "admin1502");
+        return new Administrador("Admin Eve", "2019776f@umich.mx", "adminchaparra");
     }
     public static Usuario crearUsuarioAdminPorDefecto3() {
         return new Administrador("Admin Oliver", "sefidoalker@gmail.com", "admin234");
