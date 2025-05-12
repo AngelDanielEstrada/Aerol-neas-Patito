@@ -198,21 +198,49 @@ public class Main {
             System.out.println("1. Crear vuelo");
             System.out.println("2. Asignar tripulación");
             System.out.println("3. Ver vuelos");
-            System.out.println("4. Volver");
+            System.out.println("4. Eliminar vuelo");  // <-- Nueva opción
+            System.out.println("5. Volver");
             System.out.print("Seleccione una opción: ");
 
             int opcion = leerOpcion();
 
-            switch (opcion) {
-                case 1 -> crearVuelo();
-                case 2 -> asignarTripulacion();
-                case 3 -> listarVuelos();
-                case 4 -> volver = true;
-                default -> System.out.println("Opción inválida");
-            }
+
+                switch (opcion) {
+                    case 1 -> crearVuelo();
+                    case 2 -> asignarTripulacion();
+                    case 3 -> listarVuelos();
+                    case 4 -> eliminarVuelo();  // <-- Nuevo caso
+                    case 5 -> volver = true;
+                    default -> System.out.println("Opción inválida");
+                }
+
+
         }
     }
+    private static void eliminarVuelo() {
+        if (vuelos.isEmpty()) {
+            System.out.println("No hay vuelos registrados para eliminar");
+            return;
+        }
 
+        System.out.println("\n=== ELIMINAR VUELO ===");
+        listarVuelos();  // Mostrar lista de vuelos
+        System.out.print("Ingrese el número del vuelo a eliminar: ");
+        String numeroVuelo = scanner.nextLine();
+
+        // Buscar el vuelo por número
+        Vuelo vueloAEliminar = vuelos.stream()
+                .filter(v -> v.getNumero().equals(numeroVuelo))
+                .findFirst()
+                .orElse(null);
+
+        if (vueloAEliminar != null) {
+            vuelos.remove(vueloAEliminar);  // Eliminar de la lista
+            System.out.println("Vuelo eliminado exitosamente");
+        } else {
+            System.out.println("Vuelo no encontrado");
+        }
+    }
     private static void crearVuelo() {
         System.out.println("\n=== CREAR NUEVO VUELO ===");
         System.out.print("Número de vuelo: ");
@@ -414,6 +442,12 @@ public class Main {
 
         if (vuelo == null) {
             System.out.println("Vuelo no encontrado");
+            return;
+        }
+
+        // 🛑 Validación: No permitir reservar si no hay azafatos asignados
+        if (vuelo.getAzafatos() == null || vuelo.getAzafatos().isEmpty()) {
+            System.out.println("⚠ No se puede reservar este vuelo porque no tiene azafatos asignados.");
             return;
         }
 
