@@ -40,6 +40,8 @@ public class Main {
     private static void inicializarSistema() {
         // Crear admin por defecto
         usuarios.add(Autenticacion.crearUsuarioAdminPorDefecto());
+        usuarios.add(Autenticacion.crearUsuarioAdminPorDefecto2());
+        usuarios.add(Autenticacion.crearUsuarioAdminPorDefecto3());
         autenticacion = new Autenticacion(usuarios);
 
         // Autenticación
