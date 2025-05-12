@@ -343,6 +343,7 @@ public class Main {
             System.out.println("3. Cancelar reserva");
             System.out.println("4. Ver reservas");
             System.out.println("5. Volver");
+            System.out.println("6. Ver factura");
             System.out.print("Seleccione una opción: ");
 
             int opcion = leerOpcion();
@@ -353,6 +354,7 @@ public class Main {
                 case 3 -> cancelarReserva();
                 case 4 -> listarReservas();
                 case 5 -> volver = true;
+                case 6 -> verFactura();
                 default -> System.out.println("Opción inválida");
             }
         }
@@ -503,6 +505,28 @@ public class Main {
             }
         });
     }
+    private static void verFactura() {
+        listarReservas();
+        System.out.print("\nIngrese el ID de la reserva para generar factura: ");
+        String idReserva = scanner.nextLine();
+
+        for (Vuelo vuelo : vuelos) {
+            for (Reserva reserva : vuelo.getReservas()) {
+                if (reserva.getId().equalsIgnoreCase(idReserva)) {
+                    if (!reserva.getEstado().equals("COMPLETADA")) {
+                        System.out.println("❌ La reserva aún no está completada. No se puede generar factura.");
+                        return;
+                    }
+
+                    Ticket ticket = new Ticket("TCK-" + idReserva, reserva);
+                    ticket.mostrarFactura();
+                    return;
+                }
+            }
+        }
+        System.out.println("❌ Reserva no encontrada.");
+    }
+
 
     private static void verMiPerfil() {
         sesionActual.getUsuario().verPerfil();
