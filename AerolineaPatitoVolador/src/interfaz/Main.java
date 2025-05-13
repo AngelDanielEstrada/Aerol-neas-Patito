@@ -182,7 +182,6 @@ public class Main {
         admin.crearUsuario(nuevoUsuario);
         usuarios.add(nuevoUsuario);
         System.out.println("Usuario creado exitosamente");
-
     }
 
     private static void eliminarUsuario(Administrador admin) {
@@ -198,49 +197,27 @@ public class Main {
             System.out.println("1. Crear vuelo");
             System.out.println("2. Asignar tripulación");
             System.out.println("3. Ver vuelos");
-            System.out.println("4. Eliminar vuelo");  // <-- Nueva opción
-            System.out.println("5. Volver");
+            System.out.println("4. Eliminar vuelo");
+            System.out.println("5. Cancelar vuelo");
+            System.out.println("6. Reactivar vuelo");
+            System.out.println("7. Volver");
             System.out.print("Seleccione una opción: ");
 
             int opcion = leerOpcion();
 
-
-                switch (opcion) {
-                    case 1 -> crearVuelo();
-                    case 2 -> asignarTripulacion();
-                    case 3 -> listarVuelos();
-                    case 4 -> eliminarVuelo();  // <-- Nuevo caso
-                    case 5 -> volver = true;
-                    default -> System.out.println("Opción inválida");
-                }
-
-
+            switch (opcion) {
+                case 1 -> crearVuelo();
+                case 2 -> asignarTripulacion();
+                case 3 -> listarVuelos();
+                case 4 -> eliminarVuelo();
+                case 5 -> cancelarVuelo();
+                case 6 -> reactivarVuelo();
+                case 7 -> volver = true;
+                default -> System.out.println("Opción inválida");
+            }
         }
     }
-    private static void eliminarVuelo() {
-        if (vuelos.isEmpty()) {
-            System.out.println("No hay vuelos registrados para eliminar");
-            return;
-        }
 
-        System.out.println("\n=== ELIMINAR VUELO ===");
-        listarVuelos();  // Mostrar lista de vuelos
-        System.out.print("Ingrese el número del vuelo a eliminar: ");
-        String numeroVuelo = scanner.nextLine();
-
-        // Buscar el vuelo por número
-        Vuelo vueloAEliminar = vuelos.stream()
-                .filter(v -> v.getNumero().equals(numeroVuelo))
-                .findFirst()
-                .orElse(null);
-
-        if (vueloAEliminar != null) {
-            vuelos.remove(vueloAEliminar);  // Eliminar de la lista
-            System.out.println("Vuelo eliminado exitosamente");
-        } else {
-            System.out.println("Vuelo no encontrado");
-        }
-    }
     private static void crearVuelo() {
         System.out.println("\n=== CREAR NUEVO VUELO ===");
         System.out.print("Número de vuelo: ");
@@ -263,8 +240,11 @@ public class Main {
         }
 
         System.out.println("\n=== ASIGNAR TRIPULACIÓN ===");
-        System.out.println("Vuelos disponibles:");
-        listarVuelos();
+        System.out.println("Vuelos disponibles (solo activos):");
+        vuelos.stream()
+                .filter(v -> "ACTIVO".equals(v.getEstado()))
+                .forEach(v -> System.out.println("- " + v.getNumero() + ": " + v.getOrigen() + " a " + v.getDestino()));
+
         System.out.print("Seleccione el número de vuelo: ");
         String numeroVuelo = scanner.nextLine();
 
@@ -275,6 +255,11 @@ public class Main {
 
         if (vuelo == null) {
             System.out.println("Vuelo no encontrado");
+            return;
+        }
+
+        if ("CANCELADO".equals(vuelo.getEstado())) {
+            System.out.println("No se puede asignar tripulación a un vuelo cancelado");
             return;
         }
 
@@ -357,11 +342,100 @@ public class Main {
         System.out.println("\n=== LISTA DE VUELOS ===");
         vuelos.forEach(v -> {
             System.out.println("\nVuelo: " + v.getNumero());
+            System.out.println("Estado: " + v.getEstado());
             System.out.println("Ruta: " + v.getOrigen() + " - " + v.getDestino());
             System.out.println("Pasajeros: " + v.getReservas().size() + "/" + v.getCapacidadMaxima());
             System.out.println("Piloto: " + (v.getPiloto() != null ? v.getPiloto().getNombre() : "No asignado"));
             System.out.println("Azafatos: " + v.getAzafatos().stream().map(Azafato::getNombre).toList());
         });
+    }
+
+    private static void eliminarVuelo() {
+        if (vuelos.isEmpty()) {
+            System.out.println("No hay vuelos registrados para eliminar");
+            return;
+        }
+
+        System.out.println("\n=== ELIMINAR VUELO ===");
+        listarVuelos();
+        System.out.print("Ingrese el número del vuelo a eliminar: ");
+        String numeroVuelo = scanner.nextLine();
+
+        Vuelo vueloAEliminar = vuelos.stream()
+                .filter(v -> v.getNumero().equals(numeroVuelo))
+                .findFirst()
+                .orElse(null);
+
+        if (vueloAEliminar != null) {
+            vuelos.remove(vueloAEliminar);
+            System.out.println("Vuelo eliminado exitosamente");
+        } else {
+            System.out.println("Vuelo no encontrado");
+        }
+    }
+
+    private static void cancelarVuelo() {
+        if (vuelos.isEmpty()) {
+            System.out.println("No hay vuelos registrados");
+            return;
+        }
+
+        System.out.println("\n=== CANCELAR VUELO ===");
+        System.out.println("Vuelos activos disponibles:");
+        vuelos.stream()
+                .filter(v -> "ACTIVO".equals(v.getEstado()))
+                .forEach(v -> System.out.println("- " + v.getNumero() + ": " + v.getOrigen() + " a " + v.getDestino()));
+
+        System.out.print("Ingrese el número del vuelo a cancelar: ");
+        String numeroVuelo = scanner.nextLine();
+
+        Vuelo vuelo = vuelos.stream()
+                .filter(v -> v.getNumero().equals(numeroVuelo))
+                .findFirst()
+                .orElse(null);
+
+        if (vuelo != null) {
+            if ("ACTIVO".equals(vuelo.getEstado())) {
+                vuelo.cancelar();
+                System.out.println("Vuelo " + numeroVuelo + " cancelado exitosamente");
+            } else {
+                System.out.println("El vuelo ya está cancelado");
+            }
+        } else {
+            System.out.println("Vuelo no encontrado");
+        }
+    }
+
+    private static void reactivarVuelo() {
+        if (vuelos.isEmpty()) {
+            System.out.println("No hay vuelos registrados");
+            return;
+        }
+
+        System.out.println("\n=== REACTIVAR VUELO ===");
+        System.out.println("Vuelos cancelados disponibles:");
+        vuelos.stream()
+                .filter(v -> "CANCELADO".equals(v.getEstado()))
+                .forEach(v -> System.out.println("- " + v.getNumero() + ": " + v.getOrigen() + " a " + v.getDestino()));
+
+        System.out.print("Ingrese el número del vuelo a reactivar: ");
+        String numeroVuelo = scanner.nextLine();
+
+        Vuelo vuelo = vuelos.stream()
+                .filter(v -> v.getNumero().equals(numeroVuelo))
+                .findFirst()
+                .orElse(null);
+
+        if (vuelo != null) {
+            if ("CANCELADO".equals(vuelo.getEstado())) {
+                vuelo.reactivar();
+                System.out.println("Vuelo " + numeroVuelo + " reactivado exitosamente");
+            } else {
+                System.out.println("El vuelo no está cancelado");
+            }
+        } else {
+            System.out.println("Vuelo no encontrado");
+        }
     }
 
     private static void gestionarReservas() {
@@ -424,13 +498,15 @@ public class Main {
             return;
         }
 
-        // Listar vuelos con asientos disponibles
-        System.out.println("\nVuelos disponibles:");
-        vuelos.forEach(v -> {
-            System.out.println("\nVuelo: " + v.getNumero());
-            System.out.println("Ruta: " + v.getOrigen() + " - " + v.getDestino());
-            System.out.println("Asientos disponibles: " + v.getAsientosDisponibles().size());
-        });
+        // Listar vuelos con asientos disponibles y activos
+        System.out.println("\nVuelos disponibles (solo activos):");
+        vuelos.stream()
+                .filter(v -> "ACTIVO".equals(v.getEstado()))
+                .forEach(v -> {
+                    System.out.println("\nVuelo: " + v.getNumero());
+                    System.out.println("Ruta: " + v.getOrigen() + " - " + v.getDestino());
+                    System.out.println("Asientos disponibles: " + v.getAsientosDisponibles().size());
+                });
 
         System.out.print("Seleccione número de vuelo: ");
         String numeroVuelo = scanner.nextLine();
@@ -445,9 +521,14 @@ public class Main {
             return;
         }
 
-        // 🛑 Validación: No permitir reservar si no hay azafatos asignados
+        if ("CANCELADO".equals(vuelo.getEstado())) {
+            System.out.println("No se pueden hacer reservas en vuelos cancelados");
+            return;
+        }
+
+        // Validar que tenga azafatos asignados
         if (vuelo.getAzafatos() == null || vuelo.getAzafatos().isEmpty()) {
-            System.out.println("⚠ No se puede reservar este vuelo porque no tiene azafatos asignados.");
+            System.out.println("No se puede reservar este vuelo porque no tiene azafatos asignados");
             return;
         }
 
@@ -466,7 +547,7 @@ public class Main {
     }
 
     private static void confirmarReserva() {
-        listarReservas(); // Mostrar reservas pendientes
+        listarReservas();
 
         System.out.print("\nIngrese el ID de la reserva a confirmar (ej: RES-1): ");
         String idReserva = scanner.nextLine();
@@ -485,12 +566,12 @@ public class Main {
                         int opcionPago = leerOpcion();
 
                         String metodoPago = (opcionPago == 1) ? "EFECTIVO" : "TARJETA";
-                        Pago pago = new Pago(350.00, metodoPago, reserva); // Monto fijo (puedes hacerlo dinámico)
+                        Pago pago = new Pago(350.00, metodoPago, reserva);
                         pago.procesarPago();
                         reserva.confirmar();
                         System.out.println("✅ Reserva confirmada y pago registrado.");
                     } else {
-                        System.out.println("⚠️ La reserva ya está " + reserva.getEstado());
+                        System.out.println("La reserva ya está " + reserva.getEstado());
                     }
                     return;
                 }
@@ -501,6 +582,7 @@ public class Main {
             System.out.println("❌ No se encontró la reserva con ID: " + idReserva);
         }
     }
+
     private static void cancelarReserva() {
         listarReservas();
         System.out.print("\nIngrese el ID de la reserva a cancelar: ");
@@ -511,7 +593,6 @@ public class Main {
                 if (reserva.getId().equalsIgnoreCase(idReserva)) {
                     if (reserva.getEstado().equals("COMPLETADA")) {
                         System.out.println("🔄 Reembolsando pago...");
-                        // Aquí deberías buscar el pago asociado a la reserva
                     }
                     reserva.cancelar();
                     System.out.println("✅ Reserva cancelada exitosamente.");
@@ -521,6 +602,7 @@ public class Main {
         }
         System.out.println("❌ Reserva no encontrada.");
     }
+
     private static void listarReservas() {
         if (vuelos.stream().allMatch(v -> v.getReservas().isEmpty())) {
             System.out.println("No hay reservas registradas.");
@@ -531,6 +613,7 @@ public class Main {
         vuelos.forEach(vuelo -> {
             if (!vuelo.getReservas().isEmpty()) {
                 System.out.println("\n✈️ Vuelo: " + vuelo.getNumero() + " (" + vuelo.getOrigen() + " → " + vuelo.getDestino() + ")");
+                System.out.println("Estado vuelo: " + vuelo.getEstado());
                 vuelo.getReservas().forEach(reserva -> {
                     System.out.println("   🆔 ID: " + reserva.getId());
                     System.out.println("   👤 Pasajero: " + reserva.getPasajero().getNombre());
@@ -541,6 +624,7 @@ public class Main {
             }
         });
     }
+
     private static void verFactura() {
         listarReservas();
         System.out.print("\nIngrese el ID de la reserva para generar factura: ");
@@ -562,7 +646,6 @@ public class Main {
         }
         System.out.println("❌ Reserva no encontrada.");
     }
-
 
     private static void verMiPerfil() {
         sesionActual.getUsuario().verPerfil();

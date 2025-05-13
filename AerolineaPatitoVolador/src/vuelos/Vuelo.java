@@ -18,6 +18,7 @@ public class Vuelo {
     private Piloto piloto;
     private List<Azafato> azafatos;
     private int capacidadMaxima;
+    private String estado; // "ACTIVO" o "CANCELADO"
 
     public Vuelo(String numero, String origen, String destino, int capacidadMaxima) {
         this.numero = numero;
@@ -28,6 +29,7 @@ public class Vuelo {
         this.reservas = new ArrayList<>();
         this.azafatos = new ArrayList<>();
         this.capacidadMaxima = capacidadMaxima;
+        this.estado = "ACTIVO";
         inicializarAsientos();
     }
 
@@ -37,7 +39,16 @@ public class Vuelo {
         }
     }
 
-    // Métodos para gestión de tripulación
+    public List<Asiento> getAsientosDisponibles() {
+        List<Asiento> disponibles = new ArrayList<>();
+        for (Asiento asiento : asientos) {
+            if (!asiento.isOcupado()) {
+                disponibles.add(asiento);
+            }
+        }
+        return disponibles;
+    }
+
     public void asignarPiloto(Piloto piloto) {
         if (!piloto.licenciaEstaVigente()) {
             System.out.println("No se puede asignar piloto con licencia vencida");
@@ -58,8 +69,10 @@ public class Vuelo {
         System.out.println("Azafato " + azafato.getNombre() + " asignado al vuelo " + numero);
     }
 
-    // Métodos existentes para reservas (sin cambios)
     public void agregarReserva(Reserva reserva) throws ExcepcionVueloLleno {
+        if (!"ACTIVO".equals(estado)) {
+            throw new ExcepcionVueloLleno("No se pueden agregar reservas a un vuelo cancelado");
+        }
         if (reservas.size() >= capacidadMaxima) {
             throw new ExcepcionVueloLleno("Vuelo " + numero + " lleno");
         }
@@ -78,21 +91,19 @@ public class Vuelo {
         pasajeros.add(reserva.getPasajero());
     }
 
-    // Getters actualizados
-    public List<Asiento> getAsientos() {
-        return asientos;
-    }
-
-    public List<Asiento> getAsientosDisponibles() {
-        List<Asiento> disponibles = new ArrayList<>();
-        for (Asiento asiento : asientos) {
-            if (!asiento.isOcupado()) {
-                disponibles.add(asiento);
-            }
+    public void cancelar() {
+        this.estado = "CANCELADO";
+        // Cancelar todas las reservas asociadas
+        for (Reserva reserva : reservas) {
+            reserva.cancelar();
         }
-        return disponibles;
     }
 
+    public void reactivar() {
+        this.estado = "ACTIVO";
+    }
+
+    // Getters
     public String getNumero() { return numero; }
     public String getOrigen() { return origen; }
     public String getDestino() { return destino; }
@@ -100,11 +111,13 @@ public class Vuelo {
     public Piloto getPiloto() { return piloto; }
     public List<Azafato> getAzafatos() { return azafatos; }
     public int getCapacidadMaxima() { return capacidadMaxima; }
+    public String getEstado() { return estado; }
+    public List<Asiento> getAsientos() { return asientos; }
 
-    // Método para mostrar información del vuelo
     public void mostrarInfoVuelo() {
         System.out.println("=== INFORMACIÓN DE VUELO ===");
         System.out.println("Vuelo: " + numero + " | Ruta: " + origen + " -> " + destino);
+        System.out.println("Estado: " + estado);
         System.out.println("Piloto: " + (piloto != null ? piloto.getNombre() : "No asignado"));
         System.out.println("Azafatos: " + azafatos.stream().map(Azafato::getNombre).toList());
         System.out.println("Pasajeros: " + pasajeros.size() + "/" + capacidadMaxima);
